@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+//Set
+//Dictionary (Stare)
 public class DFA {
     NFA nfa;
     LinkedHashMap<String, ArrayList<Edge>> dfa;
@@ -15,7 +17,8 @@ public class DFA {
         dfa.put("q0", nfa.getNfa().get("q0")); //q0 : (a) q1 , (b) q2
 
         //until we don't find a new empty state
-        while (!findNewState().equals("empty")) {
+        while (!findNewState().equals("noNewState")) {
+            //Call the new state function
             String newState = findNewState();
             //if the state is single
             if (newState.length() == 2) {
@@ -23,6 +26,7 @@ public class DFA {
                 dfa.put(newState, nfa.getNfa().get(newState));
             } else { //if the state is not single
                 dfa.put(newState, new ArrayList<Edge>());
+                //call concatenateNodes which joins two edges with same weight
                 concatenateNodes(newState);
             }
         }
@@ -33,6 +37,7 @@ public class DFA {
     public void concatenateNodes(String nodes) {
         String[] nodesList = usingSplitMethod(nodes);//q0 q1
         ArrayList<String> weights = nfa.uniqueWeightsVoid();
+        //Loops throght every weight
         for (String weight : weights) {
             String resultNode = ""; //q0q1q0
             for (String node : nodesList) {
@@ -53,6 +58,7 @@ public class DFA {
         return text.split("(?<=\\G.{" + 2 + "})");
     }
 
+    //remove duplicates in a string, because when we append nodes we can have q0q0q1
     public String removeDuplicates(String s) {
         String[] variables = usingSplitMethod(s); //q0 q0 q1 q2
         String result = "";
@@ -65,6 +71,7 @@ public class DFA {
     }
 
     //Searches through a specific array list of a node and find an edge that has a specific weight
+    //Will find all the edges with same weights
     public String findEdgeWithWeight(String node, String weight) {
         for (Edge e : nfa.getNfa().get(node)) {
             if (e.getWeight().equals(weight)) {
@@ -75,6 +82,7 @@ public class DFA {
     }
 
     //loops through whole dfa and finds states that haven't been added to dfa yet
+    //When there will be no new state the function will return "noNewState"
     public String findNewState() {
         for (String s : dfa.keySet()) {
             for (Edge edge : dfa.get(s)) {
@@ -83,7 +91,7 @@ public class DFA {
                 }
             }
         }
-        return "empty";
+        return "noNewState";
     }
 
 

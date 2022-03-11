@@ -6,11 +6,9 @@ import java.util.LinkedHashMap;
 public class Graph {
     private LinkedHashMap<String, ArrayList<Edge>> adjList;
     private ArrayList<String> vertices;
-
     public HashMap<String, ArrayList<Edge>> getAdjList() {
         return adjList;
     }
-
 
     public Graph(LinkedHashMap<String, ArrayList<Edge>> adjList, ArrayList<String> vertices) {
         this.adjList = adjList;
@@ -25,9 +23,8 @@ public class Graph {
 
         if (!vertices.contains(src)) {//q0 a q2
             vertices.add(src);
-            Edge e = new Edge(src, dest, weight);
             adjList.put(src, new ArrayList<Edge>());
-            adjList.get(src).add(e);
+            adjList.get(src).add(new Edge(src, dest, weight));
         }
         else {
             Edge e = new Edge(src, dest, weight);

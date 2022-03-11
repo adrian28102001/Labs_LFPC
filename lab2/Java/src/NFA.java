@@ -59,7 +59,7 @@ public class NFA {
         }
         return outputEdge;
     }
-
+    //finds all the unique weights in an arraylist of edges  (a),(b)...
     public ArrayList<String> uniqueWeights(ArrayList<Edge> list) {
         ArrayList<String> outputWeights = new ArrayList<>();
         for (Edge edge : list) {

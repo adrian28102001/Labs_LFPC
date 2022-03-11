@@ -8,7 +8,6 @@ f.edge("Start", "q0")
 print("Enter production rules, when ready type \"Exit\" ")
 verticesMap = {}
 
-
 while True:
     val = input()
     if val == "exit" or val == "Exit" or val == "EXIT":

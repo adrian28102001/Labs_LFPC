@@ -1,0 +1,9 @@
+int function sum(int a, int b){
+int sum = a + b
+return sum
+}
+int main(){
+int a = 10a0 
+int b = 50
+print(sum(a, b))
+}
