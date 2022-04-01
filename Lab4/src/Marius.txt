@@ -1,0 +1,12 @@
+S aB
+S AC
+A a
+A ASC
+A BC
+A aD
+B b
+B bS
+C #
+C BA
+E aB
+D abC

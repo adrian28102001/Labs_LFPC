@@ -1,0 +1,10 @@
+S bA
+S C
+A bS
+A CBC
+A AbAa
+B BbaA
+B a
+B bSa
+C #
+D AB
