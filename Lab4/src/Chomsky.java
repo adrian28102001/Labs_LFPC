@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.util.*;
 
 public class Chomsky {
-    private final LinkedHashMap<String, ArrayList<String>> productions = new LinkedHashMap<>();
+    protected final LinkedHashMap<String, ArrayList<String>> productions = new LinkedHashMap<>();
 
     public void readInput() throws IOException {
-        File file = new File("U:\\SecondYear_Sem2\\LFPC\\Labs\\Lab4\\src\\Valentina.txt");
+        File file = new File("U:\\SecondYear_Sem2\\LFPC\\Labs\\Lab4\\src\\Adrian.txt");
         BufferedReader br = new BufferedReader(new FileReader(file));
         String string;
         while ((string = br.readLine()) != null) { //A aB
@@ -31,6 +31,17 @@ public class Chomsky {
             }
         }
         return ' ';
+    }
+
+    public boolean hasEpsilonChar(char epsilon) {
+        for (String nonTerminal : productions.keySet()) {
+            for (String value : productions.get(nonTerminal)) {
+                if (value.length() == 1 && value.equals(String.valueOf(epsilon))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     // loops through the productions and creates null states with the already found epsilon state
@@ -206,7 +217,7 @@ public class Chomsky {
         }
     }
 
-    public boolean  validProduction(String production) {
+    public boolean validProduction(String production) {
         //if the production is of the form A -> AB  or A -> a then it's valid
         return (production.length() == 2 && production.equals(production.toUpperCase())) || production.length() == 1 && production.equals(production.toLowerCase());
     }
@@ -215,7 +226,9 @@ public class Chomsky {
     public String splitProduction(String production) { // Aa | aAa
         //create a single production
         if (production.length() == 1) {
-            return createFinalProduction(production);
+            if (production.equals(production.toUpperCase()))
+                return production;
+            else return createFinalProduction(production);
         }
         //create a double production of the form: AA aa Aa
         else if (production.length() == 2) {
@@ -254,9 +267,9 @@ public class Chomsky {
         } else if (production.equals(production.toUpperCase())) {
             return production;
         } else {
-                //get the small letter from a double production like Aa
+            //get the small letter from a double production like Aa
             String smallLetter = "";
-            for (char ch:production.toCharArray()) {
+            for (char ch : production.toCharArray()) {
                 if (Character.isLowerCase(ch))
                     smallLetter = String.valueOf(ch);
             }
@@ -328,5 +341,37 @@ public class Chomsky {
 
     public LinkedHashMap<String, ArrayList<String>> getProductions() {
         return productions;
+    }
+
+    public void ChomskyMain() throws IOException {
+        System.out.println("Original");
+        readInput();
+        System.out.println();
+
+        System.out.println("Remove empty");
+        while (hasEpsilon() != ' ') {
+            char eps = hasEpsilon();
+            System.out.println(hasEpsilonChar(eps));
+            epsilonProduction(eps); //AB or BA or B
+        }
+        System.out.println();
+        System.out.println("Remove dead states (if there are)");
+        removeDeadStates();
+        printHashmap();
+        findUnitStates();
+        System.out.println();
+        System.out.println("Unit productions");
+        printHashmap();
+        System.out.println();
+        checkReachableStates();
+        System.out.println("Eliminate unreacheable states");
+        printHashmap();
+        System.out.println();
+
+        createChomsky(new ArrayList<>(getProductions().keySet()));
+        System.out.println("Renamed States");
+        printHashmap();
+        System.out.println();
+
     }
 }

@@ -1,10 +1,7 @@
-S bA
-S C
-A bS
-A CBC
-A AbAa
-B BbaA
-B a
-B bSa
-C #
-D AB
+S ASB
+A aAS
+A a
+A #
+B SbS
+B A
+B bb
