@@ -2,9 +2,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 
 public class ReadInput {
@@ -111,6 +109,7 @@ public class ReadInput {
                 equalPrecedence(value);
                 smallerPrecedence(value);
                 biggerPrecedence(value);
+                dollarRelation();
             }
         }
     }
@@ -147,7 +146,6 @@ public class ReadInput {
                         int index2 = everyChar.indexOf(value.charAt(0));
                         precedence[index2][index] = " >";
                     }
-                    break;
                 } else {
                     for (String value : lastHashmap.get(String.valueOf(production.charAt(i)))) {
                         int index = everyChar.indexOf(value.charAt(0)); //4
@@ -158,12 +156,38 @@ public class ReadInput {
                             }
                         }
                     }
-                    break;
                 }
+                break;
             }
         }
     }
+    public void dollarRelation(){
+        ArrayList<String> firstKeys = new ArrayList<>();
+        for (String key: firstHashmap.keySet()) {
+            for (String value: firstHashmap.get(key)) {
+                if (!firstKeys.contains(value)){
+                    firstKeys.add(value);
+                }
+            }
+        }
+        for (String key: firstKeys) {
+            int index = everyChar.indexOf(key.charAt(0));
+            precedence[everyChar.indexOf("$")][index] = " <";
+        }
 
+        ArrayList<String> lastKeys = new ArrayList<>();
+        for (String key: lastHashmap.keySet()) {
+            for (String value: lastHashmap.get(key)) {
+                if (!lastKeys.contains(value)){
+                    lastKeys.add(value);
+                }
+            }
+        }
+        for (String key: lastKeys) {
+            int index = everyChar.indexOf(key.charAt(0));
+            precedence[index][everyChar.indexOf("$")] = " >";
+        }
+    }
     public void printHashmap(LinkedHashMap<String, ArrayList<String>> hashMap) {
         System.out.println(hashMap);
     }
