@@ -119,7 +119,7 @@ public class ReadInput {
             for (int i = 0; i < production.length() - 1; i++) {
                 int index = everyChar.indexOf(production.charAt(i)); //4
                 int index2 = everyChar.indexOf(production.charAt(i + 1)); //4
-                precedence[index][index2] = " =";
+                precedence[index][index2] = "=";
             }
         }
     }
@@ -130,7 +130,7 @@ public class ReadInput {
                 int index = everyChar.indexOf(production.charAt(i - 1)); //4
                 for (String value : firstHashmap.get(String.valueOf(production.charAt(i)))) {
                     int index2 = everyChar.indexOf(value.charAt(0));
-                    precedence[index][index2] = " <";
+                    precedence[index][index2] = "<";
                 }
                 break;
             }
@@ -144,7 +144,7 @@ public class ReadInput {
                     int index = everyChar.indexOf(production.charAt(i + 1)); //4
                     for (String value : lastHashmap.get(String.valueOf(production.charAt(i)))) {
                         int index2 = everyChar.indexOf(value.charAt(0));
-                        precedence[index2][index] = " >";
+                        precedence[index2][index] = ">";
                     }
                 } else {
                     for (String value : lastHashmap.get(String.valueOf(production.charAt(i)))) {
@@ -152,7 +152,7 @@ public class ReadInput {
                         for (String first : firstHashmap.get(String.valueOf(production.charAt(i + 1)))) {
                             if (first.equals(first.toLowerCase())) {
                                 int index2 = everyChar.indexOf(first.charAt(0)); //4
-                                precedence[index][index2] = " >";
+                                precedence[index][index2] = ">";
                             }
                         }
                     }
@@ -161,33 +161,35 @@ public class ReadInput {
             }
         }
     }
-    public void dollarRelation(){
+
+    public void dollarRelation() {
         ArrayList<String> firstKeys = new ArrayList<>();
-        for (String key: firstHashmap.keySet()) {
-            for (String value: firstHashmap.get(key)) {
-                if (!firstKeys.contains(value)){
+        for (String key : firstHashmap.keySet()) {
+            for (String value : firstHashmap.get(key)) {
+                if (!firstKeys.contains(value)) {
                     firstKeys.add(value);
                 }
             }
         }
-        for (String key: firstKeys) {
+        for (String key : firstKeys) {
             int index = everyChar.indexOf(key.charAt(0));
-            precedence[everyChar.indexOf("$")][index] = " <";
+            precedence[everyChar.indexOf("$")][index] = "<";
         }
 
         ArrayList<String> lastKeys = new ArrayList<>();
-        for (String key: lastHashmap.keySet()) {
-            for (String value: lastHashmap.get(key)) {
-                if (!lastKeys.contains(value)){
+        for (String key : lastHashmap.keySet()) {
+            for (String value : lastHashmap.get(key)) {
+                if (!lastKeys.contains(value)) {
                     lastKeys.add(value);
                 }
             }
         }
-        for (String key: lastKeys) {
+        for (String key : lastKeys) {
             int index = everyChar.indexOf(key.charAt(0));
-            precedence[index][everyChar.indexOf("$")] = " >";
+            precedence[index][everyChar.indexOf("$")] = ">";
         }
     }
+
     public void printHashmap(LinkedHashMap<String, ArrayList<String>> hashMap) {
         System.out.println(hashMap);
     }
@@ -204,10 +206,51 @@ public class ReadInput {
                 if (precedence[i][j] == null) {
                     System.out.print(" -");
                 } else
-                    System.out.print(precedence[i][j]);
+                    System.out.print(" " + precedence[i][j]);
             }
             System.out.println();
         }
+    }
+
+    public void initializeRelationsWord(String string) { //$dabacbaa$
+        StringBuilder resultString = new StringBuilder();
+        int firstPosition, secPosition = 0;
+        for (int i = 0; i < string.length() - 1; i++) {
+            firstPosition = everyChar.indexOf(string.charAt(i));
+            secPosition = everyChar.indexOf(string.charAt(i + 1));
+            resultString.append(string.charAt(i));
+            resultString.append(precedence[firstPosition][secPosition]);
+        }
+        resultString.append("$");
+        System.out.println(resultString);
+    }
+
+    public void letterToReplace(String string) {
+        StringBuilder stringBuilder = new StringBuilder(string);
+        for (int i = 1; i < string.length() - 1; i += 2) {
+            if (string.charAt(i) == '<' && string.charAt(i + 2) == '>') {
+                String letter = String.valueOf(string.charAt(i + 1));
+                String replaceKey = replaceLetter(letter);
+                stringBuilder.replace(i + 1, i + 2, replaceKey);
+                char charBefore = stringBuilder.charAt(i - 1);
+                char charAfter = stringBuilder.charAt(i + 3);
+                String sign = precedence[everyChar.indexOf(charBefore)][everyChar.indexOf(replaceKey)];
+                stringBuilder.replace(i, i + 1, sign);
+                sign = precedence[everyChar.indexOf(replaceKey)][everyChar.indexOf(charAfter)];
+                stringBuilder.replace(i + 2, i + 3, sign);
+                break;
+            }
+        }
+        System.out.println(stringBuilder);
+    }
+
+    public String replaceLetter(String string) {
+        for (String key : productions.keySet()) {
+            if (productions.get(key).contains(string)) {
+                return key;
+            }
+        }
+        return " ";
     }
 
     public void main() throws IOException {
@@ -222,6 +265,8 @@ public class ReadInput {
         printHashmap(lastHashmap);
         System.out.println();
         printArray();
+        initializeRelationsWord("$dabacbaa$");
+        letterToReplace("$<d<a<b<a>c<b<a>a>$");
     }
 
 }
