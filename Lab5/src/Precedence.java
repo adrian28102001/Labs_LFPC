@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-public class ReadInput {
+public class Precedence {
     protected final LinkedHashMap<String, ArrayList<String>> productions = new LinkedHashMap<>();
     protected final LinkedHashMap<String, ArrayList<String>> firstHashmap = new LinkedHashMap<>();
     protected final LinkedHashMap<String, ArrayList<String>> lastHashmap = new LinkedHashMap<>();
@@ -92,6 +92,9 @@ public class ReadInput {
                     if (everyChar.indexOf(String.valueOf(characters)) == -1) { //does not
                         everyChar.append(characters);
                     }
+                    if (everyChar.indexOf(String.valueOf(key)) == -1) { //does not
+                        everyChar.append(key);
+                    }
                 }
             }
         }
@@ -104,7 +107,6 @@ public class ReadInput {
     public void establishingRelations() {
         for (String key : productions.keySet()) {
             for (String value : productions.get(key)) {
-                //FunctionCAll
                 equalPrecedence(value);
                 smallerPrecedence(value);
                 biggerPrecedence(value);
@@ -189,6 +191,100 @@ public class ReadInput {
         }
     }
 
+
+    public void initializeRelationsWord(String string) { //$dabacbaa$
+        StringBuilder resultString = new StringBuilder();
+        int firstPosition, secPosition;
+        for (int i = 0; i < string.length() - 1; i++) {
+            firstPosition = everyChar.indexOf(string.charAt(i));
+            secPosition = everyChar.indexOf(string.charAt(i + 1));
+            resultString.append(string.charAt(i));
+            resultString.append(precedence[firstPosition][secPosition]);
+        }
+        resultString.append("$");
+        System.out.println(resultString);
+    }
+
+    public void checkTheString(String string) {
+        System.out.println(string);
+        if (string.equals("$<S>$")) {
+            return;
+        }
+        StringBuilder stringBuilder = new StringBuilder(string);// $<d<a<b<a>c<b<a>a>$
+        for (int i = 1; i < string.length() - 1; i += 2) {
+            if (string.charAt(i) == '<' && string.charAt(i + 2) == '>') {
+                String letter = String.valueOf(string.charAt(i + 1));  //<a> => a is etter
+                String replaceKey = replaceLetter(letter);  // B => a so we replace a with B
+                if (!replaceKey.equals(" ")) {
+                    stringBuilder.replace(i + 1, i + 2, replaceKey);  //replace a with B
+                    stringBuilder = replaceSigns(i + 1, stringBuilder, replaceKey); //$<d<a<b=B>c<b<a>a$
+
+                    checkTheString(stringBuilder.toString()); //$<d<a<b=B>c<b<a>a$
+                    break;
+                }
+            } else if (string.charAt(i) == '=') {
+                String result = findNewString(new StringBuilder(string), i);
+                if (!result.equals(string)) {
+                    checkTheString(result);
+                    break;
+                }
+            }
+
+        }
+//        return "";
+    }
+
+    //Replaces the signs
+    public StringBuilder replaceSigns(int i, StringBuilder stringLetter, String replaceKey) {
+        char charBefore = stringLetter.charAt(i - 2);
+        char charAfter = stringLetter.charAt(i + 2);
+        String sign = precedence[everyChar.indexOf(charBefore)][everyChar.indexOf(replaceKey)];
+        stringLetter.replace(i - 1, i, sign);
+        sign = precedence[everyChar.indexOf(replaceKey)][everyChar.indexOf(charAfter)];
+        stringLetter.replace(i + 1, i + 2, sign);
+
+        return stringLetter;
+    }
+
+
+    //this function finds the quality and replaces it ex: b=c  is replaced with D
+    public String findNewString(StringBuilder stringBuilder, int startFrom) {
+        StringBuilder equalLetters = new StringBuilder(); //All the letters equal between them ex : a=B=c => aBc
+        int i = startFrom;
+        for (; i < stringBuilder.length() - 1; i += 2) {
+            if (stringBuilder.charAt(i) == '=') {
+                equalLetters.append(stringBuilder.charAt(i - 1));
+            } else {
+                break;
+            }
+        }
+        equalLetters.append(stringBuilder.charAt(i - 1));
+        StringBuilder toReplace = stringBuilder;
+        String keyToReplaceWith = replaceLetter(equalLetters.toString());
+        if (!keyToReplaceWith.equals(" ")) {
+            toReplace.replace(startFrom - 1, i, keyToReplaceWith);
+            stringBuilder = new StringBuilder(toReplace); //$<d<a<D>c<b<a>a>$
+            if (stringBuilder.toString().equals("$<S>$")) {
+                return String.valueOf(stringBuilder);
+            }
+            //After we changed the letters that are equal, we need to change their signs too
+            replaceSigns(startFrom - 1, stringBuilder, keyToReplaceWith);
+        }
+        return String.valueOf(stringBuilder);
+    }
+
+    //Searches for a key that derives in our production: ex  S ->ab
+    public String replaceLetter(String string) {
+        for (String key : productions.keySet()) {
+            for (String value : productions.get(key)) {
+                if (value.equals(string)) {
+                    return key;
+                }
+            }
+        }
+        return " ";
+    }
+
     public void printHashmap(LinkedHashMap<String, ArrayList<String>> hashMap) {
         System.out.println(hashMap);
     }
@@ -211,85 +307,8 @@ public class ReadInput {
         }
     }
 
-    public void initializeRelationsWord(String string) { //$dabacbaa$
-        StringBuilder resultString = new StringBuilder();
-        int firstPosition, secPosition = 0;
-        for (int i = 0; i < string.length() - 1; i++) {
-            firstPosition = everyChar.indexOf(string.charAt(i));
-            secPosition = everyChar.indexOf(string.charAt(i + 1));
-            resultString.append(string.charAt(i));
-            resultString.append(precedence[firstPosition][secPosition]);
-        }
-        resultString.append("$");
-        System.out.println(resultString);
-    }
-
-    public void letterToReplace(String string) {
-        StringBuilder stringBuilder = new StringBuilder(string);
-        for (int i = 1; i < string.length() - 1; i += 2) {
-            if (string.charAt(i) == '<' && string.charAt(i + 2) == '>') {
-                String letter = String.valueOf(string.charAt(i + 1));
-                String replaceKey = replaceLetter(letter);
-                stringBuilder.replace(i + 1, i + 2, replaceKey);
-                char charBefore = stringBuilder.charAt(i - 1);
-                char charAfter = stringBuilder.charAt(i + 3);
-                String sign = precedence[everyChar.indexOf(charBefore)][everyChar.indexOf(replaceKey)];
-                stringBuilder.replace(i, i + 1, sign);
-                sign = precedence[everyChar.indexOf(replaceKey)][everyChar.indexOf(charAfter)];
-                stringBuilder.replace(i + 2, i + 3, sign);
-                string = findNewString(stringBuilder);
-                letterToReplace(string);
-                break;
-
-            }
-        }
-//        return "";
-    }
-
-    public void keepGoing(String string) {
-        while (!string.isEmpty()) {
-            letterToReplace(string);
-        }
-    }
-
-    //this function finds the quality and replaces it ex: b=c  is replaced with D
-    public String findNewString(StringBuilder stringBuilder) {
-        String substring;
-        for (int i = 0; i < stringBuilder.length() - 1; i++) {
-            if (stringBuilder.charAt(i) == '=') {
-                substring = stringBuilder.substring(i - 1, i + 2);
-                String substringParameter = substring.replace("=", "");
-                String string = stringBuilder.toString();
-                string = string.replace(substring, newKey(substringParameter));
-                stringBuilder = new StringBuilder(string);
-                return String.valueOf(stringBuilder);
-            }
-        }
-        return String.valueOf(stringBuilder);
-    }
-
-    public String newKey(String substring) {
-        String newKey = "";
-        for (String key : productions.keySet()) {
-            for (String value : productions.get(key)) {
-                if (value.contains(substring)) {
-                    newKey = key;
-                }
-            }
-        }
-        return newKey;
-    }
-
-    public String replaceLetter(String string) {
-        for (String key : productions.keySet()) {
-            if (productions.get(key).contains(string)) {
-                return key;
-            }
-        }
-        return " ";
-    }
-
     public void main() throws IOException {
+        System.out.println("Initial production");
         readInput();
         for (String key : productions.keySet()) {
             first(key, key);
@@ -297,14 +316,16 @@ public class ReadInput {
         }
         createTableIndexes();
         establishingRelations();
+        System.out.println("First");
         printHashmap(firstHashmap);
+        System.out.println("Last");
         printHashmap(lastHashmap);
         System.out.println();
         printArray();
+        System.out.println();
         initializeRelationsWord("$dabacbaa$");
-//      System.out.println(letterToReplace("$<d<a<b<a>c<b<a>a>$"));
-        //letterToReplace();
-        keepGoing("$<d<a<b<a>c<b<a>a>$");
+        checkTheString("$<d<a<b<a>c<b<a>a>$");
+
     }
 
 }
