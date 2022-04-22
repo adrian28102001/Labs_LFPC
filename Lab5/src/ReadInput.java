@@ -43,10 +43,8 @@ public class ReadInput {
         for (String valueAtKey : productions.get(key)) {
             String firstChar = String.valueOf(valueAtKey.charAt(0));
             boolean isLower = firstChar.equals(firstChar.toLowerCase());
-            if (isLower) { //if first letter is small we add it to firstHashmap
-                if (!firstHashmap.get(value).contains(firstChar)) {
-                    firstHashmap.get(value).add(firstChar);
-                }
+            if (isLower && (!firstHashmap.get(value).contains(firstChar))) { //if first letter is small we add it to firstHashmap
+                firstHashmap.get(value).add(firstChar);
             } else {
                 if (!firstHashmap.get(value).contains(firstChar)) {
                     firstHashmap.get(value).add(firstChar);
@@ -54,7 +52,8 @@ public class ReadInput {
                         first(firstChar, value);
                     } else {
                         for (String val : firstHashmap.get(firstChar)) { //if first letter has been called, we copy her values
-                            if (!firstHashmap.get(value).contains(val)) firstHashmap.get(value).add(val);
+                            if (!firstHashmap.get(value).contains(val))
+                                firstHashmap.get(value).add(val);
                         }
                     }
                 }
@@ -238,10 +237,47 @@ public class ReadInput {
                 stringBuilder.replace(i, i + 1, sign);
                 sign = precedence[everyChar.indexOf(replaceKey)][everyChar.indexOf(charAfter)];
                 stringBuilder.replace(i + 2, i + 3, sign);
+                string = findNewString(stringBuilder);
+                letterToReplace(string);
                 break;
+
             }
         }
-        System.out.println(stringBuilder);
+//        return "";
+    }
+
+    public void keepGoing(String string) {
+        while (!string.isEmpty()) {
+            letterToReplace(string);
+        }
+    }
+
+    //this function finds the quality and replaces it ex: b=c  is replaced with D
+    public String findNewString(StringBuilder stringBuilder) {
+        String substring;
+        for (int i = 0; i < stringBuilder.length() - 1; i++) {
+            if (stringBuilder.charAt(i) == '=') {
+                substring = stringBuilder.substring(i - 1, i + 2);
+                String substringParameter = substring.replace("=", "");
+                String string = stringBuilder.toString();
+                string = string.replace(substring, newKey(substringParameter));
+                stringBuilder = new StringBuilder(string);
+                return String.valueOf(stringBuilder);
+            }
+        }
+        return String.valueOf(stringBuilder);
+    }
+
+    public String newKey(String substring) {
+        String newKey = "";
+        for (String key : productions.keySet()) {
+            for (String value : productions.get(key)) {
+                if (value.contains(substring)) {
+                    newKey = key;
+                }
+            }
+        }
+        return newKey;
     }
 
     public String replaceLetter(String string) {
@@ -266,7 +302,9 @@ public class ReadInput {
         System.out.println();
         printArray();
         initializeRelationsWord("$dabacbaa$");
-        letterToReplace("$<d<a<b<a>c<b<a>a>$");
+//      System.out.println(letterToReplace("$<d<a<b<a>c<b<a>a>$"));
+        //letterToReplace();
+        keepGoing("$<d<a<b<a>c<b<a>a>$");
     }
 
 }
