@@ -6,7 +6,8 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
-
+.idea
+Lab5.iml
 # Created by https://www.toptal.com/developers/gitignore/api/intellij,java
 # Edit at https://www.toptal.com/developers/gitignore?templates=intellij,java
 
