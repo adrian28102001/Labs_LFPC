@@ -1,7 +1,0 @@
-S dB
-A TcA
-T D
-A Da
-B a
-B aA
-D bB
